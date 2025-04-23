@@ -3,8 +3,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView
-from .models import Pokemon, PokemonAbility, Ability
-from .serializers import PokemonSerializer, AbilitySerializer, PokemonAbilitySerializer
+from .models import Pokemon, PokemonAbility, Ability, CombatStats
+from .serializers import PokemonSerializer, AbilitySerializer, PokemonAbilitySerializer, CombatStatsSerializer, CombatStatsDetailedSerializer
 
 class RootView(APIView):
     '''
@@ -15,7 +15,9 @@ class RootView(APIView):
 
     def get(self, request):
         return Response({
-            'pokemons' : reverse('pokemons-endpoint', request = request)
+            'pokemons' : reverse('pokemons-endpoint', request = request),
+            'combat' : reverse('combat-stats', request = request),
+            'ability' : reverse('ability-endpoint', request = request)
         })
     
 
@@ -29,7 +31,6 @@ class PokemonView(ListAPIView):
     serializer_class = PokemonSerializer
     permission_classes = [AllowAny]
 
-
 class AbilityView(ListAPIView):
     queryset = Ability.objects.all()
     serializer_class = AbilitySerializer
@@ -40,7 +41,7 @@ class PokemonAbilityView(APIView):
         Returns the ability resources of a 
         certain pokemon.
     '''
-    def get(self, request, pokemon_name):
+    def get(self, request, pokemon_name: str):
         try:
             prefetched_data = PokemonAbility.objects.prefetch_related('pokemon').filter(pokemon__name = pokemon_name)
             finalized_abilities = prefetched_data.prefetch_related('ability')
@@ -48,6 +49,28 @@ class PokemonAbilityView(APIView):
             raise ex('Make sure to pass a correct pokemon name.')
         
         serializer = PokemonAbilitySerializer(data = finalized_abilities, many = True)
+        serializer.is_valid()
+        return Response(serializer.data)
+
+
+class CombatStatsView(ListAPIView):
+    queryset = CombatStats.objects.all() 
+    serializer_class = CombatStatsSerializer
+    permission_classes = [AllowAny]
+
+class CombatStatsDetailedView(APIView):
+    '''
+        Allows the user to view detailed combat information
+        about a given pokemon.
+    '''
+    permission_classes = [AllowAny]
+
+    def get(self, request, pokemon_name: str):
+        try:
+            combat_stats = CombatStats.objects.filter(pokemon_name = pokemon_name)
+        except CombatStats.DoesNotExist as ex:
+            raise ex('Make sure to pass a correct pokemon name')
+        serializer = CombatStatsDetailedSerializer(data = combat_stats, many = True)
         serializer.is_valid()
         return Response(serializer.data)
         

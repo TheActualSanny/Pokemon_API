@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Pokemon, Ability, PokemonAbility
+from .models import Pokemon, Ability, PokemonAbility, CombatStats
 
 class PokemonSerializer(serializers.ModelSerializer):
     '''
@@ -32,3 +32,17 @@ class PokemonAbilitySerializer(serializers.ModelSerializer):
     class Meta:
         model = PokemonAbility
         fields = ['ability']
+
+
+class CombatStatsDetailedSerializer(serializers.ModelSerializer):
+    '''
+        Serializerss the combat stats as a resource.
+    '''
+    class Meta:
+        model = CombatStats
+        exclude = ['pokemon_name']
+
+class CombatStatsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CombatStats
+        fields = '__all__'
