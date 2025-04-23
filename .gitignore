@@ -1,0 +1,4 @@
+__pycache__/
+.env
+# Must rework the load_data module
+pokemon_api/load_data.py
