@@ -4,7 +4,7 @@ from rest_framework.reverse import reverse
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView
 from .models import Pokemon, PokemonAbility, Ability, CombatStats
-from .serializers import PokemonSerializer, AbilitySerializer, PokemonAbilitySerializer, CombatStatsSerializer, CombatStatsDetailedSerializer
+from .serializers import PokemonSerializer, AbilitySerializer, PokemonAbilitySerializer, CombatStatsSerializer, CombatStatsDetailedSerializer, DetailedPokemonSerializer
 
 class RootView(APIView):
     '''
@@ -15,9 +15,9 @@ class RootView(APIView):
 
     def get(self, request):
         return Response({
-            'pokemons' : reverse('pokemons-endpoint', request = request),
-            'combat' : reverse('combat-stats', request = request),
-            'ability' : reverse('ability-endpoint', request = request)
+            'pokemons' : reverse('api:pokemons-endpoint', request = request),
+            'combat' : reverse('api:combat-stats', request = request),
+            'ability' : reverse('api:ability-endpoint', request = request)
         })
     
 
@@ -31,6 +31,19 @@ class PokemonView(ListAPIView):
     serializer_class = PokemonSerializer
     permission_classes = [AllowAny]
 
+class PokemonDetailedView(APIView):
+    permission_classes = [AllowAny]
+    def get(self, request, pokemon_name: str):
+        try:
+            pokemon = Pokemon.objects.filter(name = pokemon_name).prefetch_related('combat_info')
+        except Pokemon.DoesNotExist as ex:
+            raise ex('Make sure to pass a correct pokemon name.')
+        serializer = DetailedPokemonSerializer(data = pokemon, many = True, 
+                                               context = {'request' : request})
+        serializer.is_valid()
+        return Response(serializer.data)
+
+        
 class AbilityView(ListAPIView):
     queryset = Ability.objects.all()
     serializer_class = AbilitySerializer
@@ -67,10 +80,9 @@ class CombatStatsDetailedView(APIView):
 
     def get(self, request, pokemon_name: str):
         try:
-            combat_stats = CombatStats.objects.filter(pokemon_name = pokemon_name)
+            combat_stats = CombatStats.objects.get(pokemon_name = pokemon_name)
         except CombatStats.DoesNotExist as ex:
-            raise ex('Make sure to pass a correct pokemon name')
-        serializer = CombatStatsDetailedSerializer(data = combat_stats, many = True)
-        serializer.is_valid()
-        return Response(serializer.data)
+            raise ex('Make sure to pass a correct pokemon name.')
+        serializer = CombatStatsDetailedSerializer(combat_stats)
+        return Response({'pokemon' : serializer.data})
         

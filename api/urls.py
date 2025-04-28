@@ -1,9 +1,12 @@
 from django.urls import path
 from . import views
 
+app_name = 'api'
+
 urlpatterns = [
     path('', views.RootView.as_view(), name = 'root-endpoint'),
     path('pokemons/', views.PokemonView.as_view(), name = 'pokemons-endpoint'),
+    path('pokemons/<str:pokemon_name>/', views.PokemonDetailedView.as_view(), name = 'pokemon-detailed'),
     path('ability/', views.AbilityView.as_view(), name = 'ability-endpoint'),
     path('ability/<str:pokemon_name>/', views.AbilityView.as_view(), name = 'pokemonability-endpoint'),
     path('combat/', views.CombatStatsView.as_view(), name = 'combat-stats'),
