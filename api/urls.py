@@ -10,5 +10,7 @@ urlpatterns = [
     path('ability/', views.AbilityView.as_view(), name = 'ability-endpoint'),
     path('ability/<str:pokemon_name>/', views.AbilityView.as_view(), name = 'pokemonability-endpoint'),
     path('combat/', views.CombatStatsView.as_view(), name = 'combat-stats'),
-    path('combat/<str:pokemon_name>/', views.CombatStatsDetailedView.as_view(), name = 'combat-endpoint')
+    path('combat/<str:pokemon_name>/', views.CombatStatsDetailedView.as_view(), name = 'combat-endpoint'),
+    path('information/', views.MainInfoView.as_view(), name = 'info-endpoint'),
+    path('additional/', views.AddInfoView.as_view(), name = 'additional-information-endpoint')
 ]
