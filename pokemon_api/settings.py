@@ -98,9 +98,15 @@ SIMPLE_JWT = {
 }
 
 
-REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 20
+SWAGGER_SETTINGS = {
+    'USE_SESSION_AUTH' : False,
+    'SECURITY_DEFINITIONS': {
+        'Authorization': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization'
+        }
+    }
 }
 
 # Password validation
