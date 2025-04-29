@@ -22,6 +22,7 @@ class AdditionalInformation(models.Model):
         PokemonInformation
     '''
     id = models.AutoField(primary_key = True)
+    name = models.CharField(max_length = 90, null = True)
     capture_rate = models.CharField(max_length = 100)
     base_egg_steps = models.IntegerField()
     experience_growth = models.FloatField()

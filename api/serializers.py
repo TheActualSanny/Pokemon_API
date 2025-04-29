@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Pokemon, Ability, PokemonAbility, CombatStats, PokemonInformation, AdditionalInformation, DamageInfo
+from rest_framework.reverse import reverse
 
 class PokemonSerializer(serializers.ModelSerializer):
     '''
@@ -63,14 +64,35 @@ class DetailedPokemonSerializer(serializers.HyperlinkedModelSerializer):
         This resource will contain the URLs to get the neccessary data
         from the abilities.
     '''
-    combat_info = CombatStatsDetailedSerializer()
-    main_information = DetailedInformationSerializer()
-    additional_information = DetailedAdditionalInformation()
-    damage_information = DetailedDamageInformation()
+    combat_info = serializers.SerializerMethodField()
+    ability_info = serializers.SerializerMethodField()
+    main_information = serializers.SerializerMethodField()
+    additional_information = serializers.SerializerMethodField()
+    damage_information = serializers.SerializerMethodField()
     
     class Meta:
         model = Pokemon
         fields = ['name', 'japanese_name', 'pokedex_number',
-                  'combat_info', 'main_information', 'additional_information',
-                  'damage_information']
-        
+                'combat_info', 'ability_info', 'main_information', 
+                'additional_information', 'damage_information']
+    
+    def get_combat_info(self, obj):
+        request = self.context.get('request')
+        return reverse('api:combat-endpoint', kwargs = {'name' : obj.name}, request = request)
+    
+    def get_ability_info(self, obj):
+        request = self.context.get('request')
+        return reverse('api:pokemonability-endpoint', kwargs = {'pokemon_name' : obj.name}, request = request)
+    
+    def get_additional_information(self, obj):
+        request = self.context.get('request')
+        return reverse('api:additional-detailed-endpoint', kwargs = {'name' : obj.name},
+                       request = request)
+    def get_main_information(self, obj):
+        request = self.context.get('request')
+        return reverse('api:main-detailed-endpoint', kwargs = {'name' : obj.name},
+                       request = request)
+    def get_damage_information(self, obj):
+        request = self.context.get('request')
+        return reverse('api:detailed-damage', kwargs = {'pokemon_name' : obj.name}, 
+                       request = request)
