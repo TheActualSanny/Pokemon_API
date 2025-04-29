@@ -8,6 +8,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.exceptions import AuthenticationFailed
 from .serializers import RegisterSerializer, LoginSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from drf_yasg.utils import swagger_auto_schema
 
 class AuthenticationHomeView(APIView):
     permission_classes = [AllowAny]
@@ -26,6 +27,7 @@ class Register(APIView):
             'message' : 'To create an account, pass the credentials'
         })
     
+    @swagger_auto_schema(request_body = RegisterSerializer)
     def post(self, request):
         serializer = RegisterSerializer(data = request.data)
         if not serializer.is_valid():
@@ -47,8 +49,10 @@ class Login(APIView):
             'message' : "To login, pass the account's credentials"
         })
     
+    @swagger_auto_schema(request_body = LoginSerializer)
     def post(self, request):
         credentials = LoginSerializer(data = request.data)
+        credentials.is_valid()
         user = authenticate(username = credentials.validated_data.get('username'),
                             password = credentials.validated_data.get('password'))
         if not user:

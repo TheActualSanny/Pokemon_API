@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from .models import Pokemon, PokemonAbility, Ability, CombatStats, PokemonInformation, AdditionalInformation, DamageInfo
 from . import serializers 
+from drf_yasg.utils import swagger_auto_schema
 
 class RootView(APIView):
     '''
@@ -21,6 +22,7 @@ class RootView(APIView):
         })
     
 
+
 class PokemonView(ListAPIView):
     '''
         Lists all of the pokemons available in the
@@ -31,8 +33,14 @@ class PokemonView(ListAPIView):
     serializer_class = serializers.PokemonSerializer
     permission_classes = [AllowAny]
 
+    @swagger_auto_schema(responses = {200 : serializers.PokemonSerializer})
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
 class PokemonDetailedView(APIView):
     permission_classes = [AllowAny]
+
+    @swagger_auto_schema(responses = {200: serializers.DetailedPokemonSerializer})
     def get(self, request, pokemon_name: str):
         try:
             pokemon = Pokemon.objects.filter(name = pokemon_name)
@@ -49,11 +57,16 @@ class AbilityView(ListAPIView):
     serializer_class = serializers.AbilitySerializer
     permission_classes = [AllowAny]
 
+    @swagger_auto_schema(responses = {200: serializers.AbilitySerializer})
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
 class PokemonAbilityView(APIView):
     '''
         Returns the ability resources of a 
         certain pokemon.
     '''
+    @swagger_auto_schema(response = {200: serializers.PokemonAbilitySerializer})
     def get(self, request, pokemon_name: str):
         try:
             prefetched_data = PokemonAbility.objects.prefetch_related('pokemon').filter(pokemon__name = pokemon_name)
@@ -70,16 +83,28 @@ class DamageInfoView(ListAPIView):
     serializer_class = serializers.DetailedDamageInformation
     permission_classes = [AllowAny]
 
+    @swagger_auto_schema(responses = {200: serializers.DetailedDamageInformation})
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
 class DetailedDamageInfo(RetrieveAPIView):
     queryset = DamageInfo.objects.all()
     serializer_class = serializers.DetailedDamageInformation
     permission_classes = [AllowAny]
     lookup_field = 'pokemon_name'
 
+    @swagger_auto_schema(responses = {200: serializers.DetailedDamageInformation})
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
 class MainInfoView(ListAPIView):
     queryset = PokemonInformation.objects.all()
     serializer_class = serializers.DetailedInformationSerializer
     permission_classes = [AllowAny]
+
+    @swagger_auto_schema(responses = {200: serializers.DetailedInformationSerializer})
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
 class MainInfoDetailed(RetrieveAPIView):
     queryset = PokemonInformation.objects.all()
@@ -87,12 +112,18 @@ class MainInfoDetailed(RetrieveAPIView):
     permission_classes = [AllowAny]
     lookup_field = 'name'
 
-
+    @swagger_auto_schema(responses = {200: serializers.DetailedInformationSerializer})
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
 class AddInfoView(ListAPIView):
     queryset = AdditionalInformation.objects.all()
     serializer_class = serializers.DetailedAdditionalInformation
     permission_classes = [AllowAny]
+
+    @swagger_auto_schema(responses = {200: serializers.DetailedAdditionalInformation})
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
 class AddInfoDetailed(RetrieveAPIView):
     queryset = AdditionalInformation.objects.all()
@@ -100,10 +131,18 @@ class AddInfoDetailed(RetrieveAPIView):
     permission_classes = [AllowAny]
     lookup_field = 'name'
 
+    @swagger_auto_schema(responses = {200: serializers.DetailedAdditionalInformation})
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+    
 class CombatStatsView(ListAPIView):
     queryset = CombatStats.objects.all() 
     serializer_class = serializers.CombatStatsSerializer
     permission_classes = [AllowAny]
+
+    @swagger_auto_schema(responses = {200: serializers.CombatStatsSerializer})
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
 class CombatStatsDetailedView(APIView):
     '''
@@ -112,6 +151,7 @@ class CombatStatsDetailedView(APIView):
     '''
     permission_classes = [AllowAny]
 
+    @swagger_auto_schema(responses = {200: serializers.CombatStatsDetailedSerializer})
     def get(self, request, name: str):
         try:
             combat_stats = CombatStats.objects.get(pokemon_name = name)
